@@ -24,6 +24,8 @@
  * What is the sum of the priorities of those item types?
  */
 
+
+$time_start = microtime(true);
 $file_name = "puzzle-input.txt";
 
 $file = fopen($file_name, "r");
@@ -65,36 +67,73 @@ if ($file) {
         $elf_group[] = trim($rucksack);
 
         if (count($elf_group) === 3) {
-            $str = implode($elf_group);
-            $frequencies = count_chars($str, 1);
 
-            // Filter out characters appearing less than 3 times
-            $characters_appearing_at_least_thrice = [];
-            foreach ($frequencies as $char => $freq) {
-                if ($freq >= 3) {
-                    $characters_appearing_at_least_thrice[] = chr($char);
+            // Option 1: Fancy - Create a character frequency and use shorter list to loop over rucksacks
+            // Option 1 Time: ~0.0005 seconds (0.00045, 0.00052, 0.00048)
+            // Option 2: Brute Force - Loop over each character in each rucksack and compare to other rucksacks
+            // Option 2 Time: ~0.0003 seconds (0.00029, 0.00032, 0.00031)
+            $option = 2;
+
+            if ($option === 1) {
+                $str = implode($elf_group);
+                $frequencies = count_chars($str, 1);
+
+                // Filter out characters appearing less than 3 times
+                $characters_appearing_at_least_thrice = [];
+                foreach ($frequencies as $char => $freq) {
+                    if ($freq >= 3) {
+                        $characters_appearing_at_least_thrice[] = chr($char);
+                    }
+                }
+
+                foreach ($characters_appearing_at_least_thrice as $character) {
+                    $rucksacks_with_character = 0;
+
+                    foreach ($elf_group as $rucksack) {
+                        if (strpos($rucksack, $character) !== false) {
+                            $rucksacks_with_character++;
+                        }
+                    }
+
+                    if ($rucksacks_with_character === 3) {
+                        $priority = $priorities[strtolower($character)];
+                        if (ctype_upper($character)) {
+                            $priority += 26;
+                        }
+
+                        $priority_sum += $priority;
+
+                        // only need to find the first match because there is only exactly 1 matching character per group
+                        break;
+                    }
                 }
             }
 
-            foreach ($characters_appearing_at_least_thrice as $character) {
-                $rucksacks_with_character = 0;
-
+            if ($option === 2) {
                 foreach ($elf_group as $rucksack) {
-                    if (strpos($rucksack, $character) !== false) {
-                        $rucksacks_with_character++;
+                    $rucksack_array = str_split($rucksack);
+                    $remaining_rucksacks = array_diff($elf_group, [$rucksack]);
+
+                    foreach ($rucksack_array as $character) {
+                        $matching_rucksack_count = 0;
+                        foreach ($remaining_rucksacks as $remaining_rucksack) {
+                            if (strpos($remaining_rucksack, $character) !== false) {
+                                $matching_rucksack_count++;
+                            }
+                        }
+
+                        if ($matching_rucksack_count === 2) {
+                            $priority = $priorities[strtolower($character)];
+                            if (ctype_upper($character)) {
+                                $priority += 26;
+                            }
+
+                            $priority_sum += $priority;
+
+                            // only need to find the first match because there is only exactly 1 matching character per group
+                            break 2;
+                        }
                     }
-                }
-
-                if ($rucksacks_with_character === 3) {
-                    $priority = $priorities[strtolower($character)];
-                    if (ctype_upper($character)) {
-                        $priority += 26;
-                    }
-
-                    $priority_sum += $priority;
-
-                    // only need to find the first match because there is only exactly 1 matching character per group
-                    break;
                 }
             }
 
@@ -107,7 +146,11 @@ if ($file) {
     echo "Unable to open the file: $file_name";
 }
 
-
+$time_end = microtime(true);
+$time = $time_end - $time_start;
+// first idea = 0.0005 seconds
 // print final answer and save to clipboard to paste into answer input on the webpage
 exec('echo "' . $priority_sum . '" | pbcopy');
-echo PHP_EOL . $priority_sum;
+echo PHP_EOL . $priority_sum . PHP_EOL;
+echo '==== Executed In ====' . PHP_EOL;
+echo $time . PHP_EOL;
