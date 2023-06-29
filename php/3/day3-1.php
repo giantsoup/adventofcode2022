@@ -1,5 +1,27 @@
 <?php
 
+/*
+ * Advent of Code: Day 3
+ *
+ * The Elves have made a list of all the items currently in each rucksack (your puzzle input), but they need your
+ * help finding the errors. Every item type is identified by a single lowercase or uppercase letter (that is, a and A
+ * refer to different types of items).
+ *
+ * The list of items for each rucksack is given as characters all on a single line. A given rucksack always has the
+ * same number of items in each of its two compartments, so the first half of the characters represent items in the
+ * first compartment, while the second half of the characters represent items in the second compartment.
+ *
+ * To help prioritize item rearrangement, every item type can be converted to a priority:
+ * Lowercase item types a through z have priorities 1 through 26.
+ * Uppercase item types A through Z have priorities 27 through 52.
+ *
+ * In the above example, the priority of the item type that appears in both compartments of each rucksack is
+ * 16 (p), 38 (L), 42 (P), 22 (v), 20 (t), and 19 (s); the sum of these is 157.
+ *
+ * Find the item type that appears in both compartments of each rucksack.
+ * What is the sum of the priorities of those item types?
+ */
+
 $file_name = "puzzle-input.txt";
 
 $file = fopen($file_name, "r");
@@ -37,25 +59,25 @@ $priorities = [
 if ($file) {
     while (($rucksack = fgets($file)) !== false) {
         $priority = 0;
-        $rucksack_array = str_split($rucksack);
-        // only do anything id we have an even number of items in the array
-//        if (!(count($rucksack_array) % 2)) {
-            $halfway = count($rucksack_array) / 2;
-            $compartment_one = array_slice($rucksack_array, 0, $halfway);
-            $compartment_two = array_slice($rucksack_array, $halfway);
+        $rucksack_array = str_split(trim($rucksack));
+        $halfway = count($rucksack_array) / 2;
 
-            foreach ($compartment_one as $type_one) {
-                foreach ($compartment_two as $type_two) {
-                    if (!strcmp($type_one, $type_two)) {
-                        $priority = $priorities[strtolower($type_one)];
-                        if (ctype_upper($type_one)) {
-                            $priority += 26;
-                        }
-                        $priority_sum += $priority;
-                    }
+        $compartment_one = array_slice($rucksack_array, 0, $halfway);
+        $compartment_two = array_slice($rucksack_array, $halfway);
+
+        foreach ($compartment_one as $type_one) {
+            if (in_array($type_one, $compartment_two)) {
+
+                $priority = $priorities[strtolower($type_one)];
+                if (ctype_upper($type_one)) {
+                    $priority += 26;
                 }
+
+                $priority_sum += $priority;
+                // only need to find the first match because there is only exactly 1 matching character per rucksack
+                break;
             }
-//        }
+        }
 
     }
 
@@ -66,5 +88,5 @@ if ($file) {
 
 
 // print final answer and save to clipboard to paste into answer input on the webpage
-exec('echo "'.$priority_sum.'" | pbcopy');
-echo PHP_EOL.$priority_sum;
+exec('echo "' . $priority_sum . '" | pbcopy');
+echo PHP_EOL . $priority_sum;
