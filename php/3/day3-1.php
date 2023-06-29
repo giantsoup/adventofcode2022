@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Advent of Code: Day 3
+ * Advent of Code: Day 3-1
  *
  * The Elves have made a list of all the items currently in each rucksack (your puzzle input), but they need your
  * help finding the errors. Every item type is identified by a single lowercase or uppercase letter (that is, a and A
