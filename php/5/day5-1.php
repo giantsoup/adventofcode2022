@@ -52,42 +52,37 @@ $parsing_stack = true;
 
 if ($file) {
     while (($line = fgets($file)) !== false) {
-//        if (!$parsing_stack) {
-//            echo PHP_EOL . 'Stack 1: ' . print_r($stacks[1], true);
-//            echo PHP_EOL . 'Stack 2: ' . print_r($stacks[2], true);
-//            echo PHP_EOL . 'Stack 3: ' . print_r($stacks[3], true);
-//            die();
-//        }
         if ($parsing_stack) {
-            echo PHP_EOL . PHP_EOL . 'Parsing Stack';
             $stack_array = str_split($line);
-            echo PHP_EOL . print_r($stack_array, true);
             foreach ($stack_array as $position => $item) {
-                echo PHP_EOL . 'item: ' . $item . ' position: ' . $position;
 
                 if ($item == 1) {
                     $parsing_stack = false;
-                    echo PHP_EOL . 'Done parsing stack';
                     foreach ($stacks as $key => $stack) {
-                        echo PHP_EOL . 'Reversed Stack: ' . print_r(array_reverse($stack), true);
                         $stacks[$key] = array_reverse($stack);
                     }
-                    echo PHP_EOL . 'Stacks: ';
-                    echo PHP_EOL . print_r($stacks, true);
                     break;
                 }
 
                 if (!in_array($item, ['', ' ', '[', ']', PHP_EOL])) {
-                    echo PHP_EOL . 'This is a letter';
                     if ($position == 1) {
-                        echo PHP_EOL . 'Should be in Stack 1';
                         $stacks[1][] = $item;
                     } elseif ($position == 5) {
-                        echo PHP_EOL . 'Should be in Stack 2';
                         $stacks[2][] = $item;
                     } elseif ($position == 9) {
-                        echo PHP_EOL . 'Should be in Stack 3';
                         $stacks[3][] = $item;
+                    } elseif ($position == 13) {
+                        $stacks[4][] = $item;
+                    } elseif ($position == 17) {
+                        $stacks[5][] = $item;
+                    } elseif ($position == 21) {
+                        $stacks[6][] = $item;
+                    } elseif ($position == 25) {
+                        $stacks[7][] = $item;
+                    } elseif ($position == 29) {
+                        $stacks[8][] = $item;
+                    } elseif ($position == 33) {
+                        $stacks[9][] = $item;
                     }
                 }
             }
@@ -98,34 +93,17 @@ if ($file) {
         }
 
         if (!$parsing_stack and $line != PHP_EOL) {
-            echo PHP_EOL . PHP_EOL . 'Parsing Instructions';
             $instruction_array = explode(' ', $line);
-            echo PHP_EOL . print_r($instruction_array, true);
             $move = (int) $instruction_array[1];
             $from = (int) $instruction_array[3];
             $to = (int) $instruction_array[5];
-            echo PHP_EOL . 'Move: ' . gettype($move);
-            echo PHP_EOL . 'From: ' . gettype($from);
-            echo PHP_EOL . 'To: ' . gettype($to);
-            echo PHP_EOL . 'To Stack Outside For Loop: ' . print_r($stacks[$to], true);
             if ($instruction_array[0] == 'move') {
                 for ($i = 1; $i <= $move; $i++) {
-                    echo PHP_EOL . 'Before Stacks: ' . print_r($stacks, true);
-                    echo PHP_EOL . 'Item Number: ' . $i;
-                    echo PHP_EOL . 'From Stack: ' . $from;
-                    echo PHP_EOL . print_r($stacks[$from], true);
-                    echo PHP_EOL . 'To Stack: ' . $to;
-                    echo PHP_EOL . print_r($stacks[$to], true);
-
                     $stacks[$to][] = array_pop($stacks[$from]);
-
-                    echo PHP_EOL . 'After Stacks: ' . print_r($stacks, true);
                 }
             }
         }
     }
-
-    echo PHP_EOL . 'Final Stacks: ' . print_r($stacks, true);
 
     foreach ($stacks as $stack) {
         $top_items_on_stack[] = array_pop($stack);
